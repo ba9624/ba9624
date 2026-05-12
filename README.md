@@ -87,6 +87,38 @@ graph TD
 ```
 Sicherheit ist kein Feature – sie ist die Architektur.
 ```
+```mermaid
+graph TD
+    %% Akteure und Dashboard
+    Techniker((Mitarbeiter)) -- MFA Login --> Dashboard[SRA Dashboard]
+    Dashboard -- API Request --> SnipeIT[(Snipe-IT Asset Mgmt)]
+    
+    %% Validierung & Zertifikat
+    subgraph "Sicherheits-Backend (Bielefeld HQ)"
+        Dashboard -- 1. Validierung --> CA[Interne CA / PKI]
+        CA -- 2. Kurzzeit-Zertifikat --> Dashboard
+    end
+    
+    %% Verbindungspfad
+    Dashboard -- 3. OpenVPN Port 1194 --> RPi[Raspberry Pi 5 Gateway]
+    
+    subgraph "Kunden-Standort (Edge)"
+        RPi -- 4. HWID Check --> EX707[Exor EX707 Maschine]
+        RPi -- 5. OpenVPN Port 1195 --> EX707
+    end
+    
+    %% Monitoring
+    Monitoring{Security Health}
+    EX707 -.-> Monitoring
+    RPi -.-> Monitoring
+    Monitoring -- TLS 1.3 / Fail2Ban / Audit-Log --> Dashboard
+
+    %% Styling
+    style Dashboard fill:#001a0d,stroke:#00ff88,color:#fff
+    style RPi fill:#c51a4a,stroke:#fff,color:#fff
+    style EX707 fill:#333,stroke:#fff,color:#fff
+    style SnipeIT fill:#0075c2,stroke:#fff,color:#fff
+```
 
 - 🔐 **Zero Trust:** Jedes Gerät wird verifiziert – Zertifikat + Hardware-ID + Zeitfenster
 - ⏱️ **Minimale Exposition:** Zertifikate gelten nur 2 Stunden, kein dauerhafter Zugang
@@ -102,3 +134,17 @@ Sicherheit ist kein Feature – sie ist die Architektur.
   💼 <b>LinkedIn:</b> <a href="#">Profil-Link einfügen</a><br />
   📧 <b>E-Mail:</b> E-Mail einfügen
 </p>
+
+```mermaid
+graph LR
+    A[Detektion: Alarm/Log] --> B{Kritisch?}
+    B -- Ja --> C[Containment: Cert-Revoke]
+    B -- Nein --> D[Monitoring verschärfen]
+    C --> E[Analyse: Audit-Log]
+    E --> F[Recovery: Patch/New Cert]
+    F --> G[Update Dashboard Health]
+
+    style C fill:#cc0000,color:#fff
+    style G fill:#00ff88,color:#000
+```
+
