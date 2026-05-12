@@ -67,6 +67,11 @@ Mitarbeiter → OpenVPN (Port 1194) → Raspberry Pi 5 → OpenVPN (Port 1195) �
 </p>
 
 ---
+graph TD
+    %% Akteure und Dashboard
+    Techniker((Mitarbeiter)) -- MFA Login --> Dashboard[SRA Dashboard]
+    Dashboard -- API Request --> SnipeIT[(Snipe-IT Asset Mgmt)]
+    
 
 ## 📊 GitHub Stats
 
